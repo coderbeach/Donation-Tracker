@@ -19,7 +19,6 @@ import CampsCenters from './pages/CampsCenters';
 import Volunteers from './pages/Volunteers';
 import SurvivalCalculator from './pages/SurvivalCalculator';
 import Campaigns from './pages/Campaigns';
-import Analytics from './pages/Analytics';
 
 export const API_BASE = 'http://localhost:5000/api';
 
@@ -65,8 +64,6 @@ function App() {
         return <SurvivalCalculator role={role} />;
       case 'campaigns':
         return <Campaigns role={role} />;
-      case 'analytics':
-        return <Analytics role={role} />;
       default:
         return <Dashboard role={role} setActiveTab={setActiveTab} />;
     }
@@ -79,7 +76,6 @@ function App() {
     { id: 'volunteers', label: 'Volunteers', icon: Users2 },
     { id: 'calculator', label: 'Survival Calculator', icon: Calculator },
     { id: 'campaigns', label: 'Campaigns', icon: Target },
-    { id: 'analytics', label: 'Financial & Marketing', icon: BarChart3 },
   ];
 
   return (
