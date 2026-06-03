@@ -1,0 +1,85 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   // "ADMIN" | "MANAGER" | "VOLUNTEER"
+  createdAt DateTime @default(now())
+}
+
+model DogCamp {
+  id              String      @id @default(uuid())
+  name            String
+  location        String
+  capacity        Int
+  dogsCount       Int
+  foodCost        Float
+  medicalCost     Float
+  maintenanceCost Float
+  volunteers      Volunteer[]
+  createdAt       DateTime    @default(now())
+}
+
+model OrphanCenter {
+  id              String   @id @default(uuid())
+  name            String
+  childrenCount   Int
+  foodCost        Float
+  educationCost   Float
+  healthcareCost  Float
+  utilityCost     Float
+  staffSalaryCost Float
+  createdAt       DateTime @default(now())
+}
+
+model Campaign {
+  id           String     @id @default(uuid())
+  title        String
+  goal         Float
+  amountRaised Float      @default(0.0)
+  donorsCount  Int        @default(0)
+  donations    Donation[]
+  createdAt    DateTime   @default(now())
+}
+
+model Donation {
+  id            String    @id @default(uuid())
+  donorName     String
+  amount        Float
+  date          DateTime  @default(now())
+  paymentMethod String    // "CREDIT_CARD" | "UPI" | "BANK_TRANSFER" | "PAYPAL"
+  campaignId    String?
+  campaign      Campaign? @relation(fields: [campaignId], references: [id])
+  donationType  String    // "DOGS" | "ORPHANS" | "GENERAL"
+  status        String    // "COMPLETED" | "PENDING"
+}
+
+model Volunteer {
+  id               String   @id @default(uuid())
+  name             String
+  age              Int
+  skills           String   // Comma-separated list
+  availability     String   // "WEEKENDS" | "WEEKDAYS" | "FULL_TIME"
+  assignedCampId   String?
+  assignedCamp     DogCamp? @relation(fields: [assignedCampId], references: [id])
+  hoursContributed Float    @default(0.0)
+  createdAt        DateTime @default(now())
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  description String
+  amount      Float
+  category    String   // e.g. "FOOD", "MEDICAL", "UTILITIES", "SALARY"
+  date        DateTime @default(now())
+  type        String   // "DOGS" | "ORPHANS" | "GENERAL"
+}

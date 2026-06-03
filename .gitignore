@@ -1,0 +1,21 @@
+# Ignore dependency folders
+node_modules/
+jspdf/
+html2pdf/
+
+# Ignore local database records
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+
+# Ignore environment variables
+.env
+.env.local
+
+# Ignore build outputs
+dist/
+build/
+out/
+
+# OS metadata
+.DS_Store
+Thumbs.db
