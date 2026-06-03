@@ -584,3 +584,5 @@ app.get('/api/reports/predictions', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`PawHope backend API is running on port ${PORT}`);
 });
+
+export default app;
