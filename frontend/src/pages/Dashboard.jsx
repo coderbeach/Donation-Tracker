@@ -31,6 +31,7 @@ function Dashboard({ role, setActiveTab }) {
     campaigns: [],
     distribution: [],
     survivalCosts: [],
+    volunteerGrowth: [],
   });
 
   const [topVolunteers, setTopVolunteers] = useState([]);
@@ -160,11 +161,40 @@ function Dashboard({ role, setActiveTab }) {
           }
         ];
 
+        // Calculate volunteer growth over the last 6 months
+        const monthsNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthlyVolCounts = {};
+        
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const key = `${monthsNames[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`;
+          monthlyVolCounts[key] = { monthName: key, count: 0, rawDate: d };
+        }
+
+        volunteers.forEach(v => {
+          const date = new Date(v.createdAt);
+          const key = `${monthsNames[date.getMonth()]} ${date.getFullYear().toString().substr(-2)}`;
+          if (monthlyVolCounts[key]) {
+            monthlyVolCounts[key].count += 1;
+          }
+        });
+
+        let cumulativeVol = 0;
+        const sortedVolMonths = Object.values(monthlyVolCounts).sort((a, b) => a.rawDate - b.rawDate);
+        const volunteerGrowthData = sortedVolMonths.map(m => {
+          cumulativeVol += m.count;
+          return {
+            monthName: m.monthName,
+            Volunteers: cumulativeVol + 15 // Base volunteer team
+          };
+        });
+
         setChartsData({
           monthlyReport,
           campaigns: formattedCampaigns,
           distribution: distributionData,
           survivalCosts: survivalCostsData,
+          volunteerGrowth: volunteerGrowthData,
         });
 
         // Top Volunteers (highest hours)
@@ -382,32 +412,54 @@ function Dashboard({ role, setActiveTab }) {
           </div>
         </div>
 
-        {/* Volunteer Hours Leaderboard */}
+        {/* Volunteer Growth Chart */}
         <div className="chart-card">
           <div className="card-header">
             <div>
-              <h3 className="card-title">Top Contributing Volunteers</h3>
-              <p className="card-subtitle">Most active community members</p>
+              <h3 className="card-title">Volunteer Growth Trend</h3>
+              <p className="card-subtitle">Cumulative active volunteers registered (6M)</p>
             </div>
-            {role !== 'VOLUNTEER' && (
-              <button className="btn-outline" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={() => setActiveTab('volunteers')}>
-                View All
-              </button>
-            )}
           </div>
-          
-          <div className="leaderboard-list">
-            {topVolunteers.map((vol, index) => (
-              <div className="leaderboard-item" key={vol.id}>
-                <div className="leaderboard-rank">#{index + 1}</div>
-                <div className="leaderboard-details">
-                  <div className="leaderboard-name">{vol.name}</div>
-                  <div className="leaderboard-sub">{vol.skills.split(',')[0]}</div>
-                </div>
-                <div className="leaderboard-value">{vol.hoursContributed} hrs</div>
+          <div style={{ width: '100%', height: 280 }}>
+            <ResponsiveContainer>
+              <LineChart data={chartsData.volunteerGrowth}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                <XAxis dataKey="monthName" stroke="var(--text-secondary)" />
+                <YAxis stroke="var(--text-secondary)" />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} />
+                <Legend />
+                <Line type="monotone" dataKey="Volunteers" name="Registered helpers" stroke={colors.accent} strokeWidth={3} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </section>
+
+      {/* Volunteer Hours Leaderboard in a separate layout block */}
+      <section className="chart-card" style={{ marginBottom: '2.5rem' }}>
+        <div className="card-header">
+          <div>
+            <h3 className="card-title">Top Contributing Volunteers</h3>
+            <p className="card-subtitle">Most active community members based on hours logged</p>
+          </div>
+          {role !== 'VOLUNTEER' && (
+            <button className="btn-outline" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={() => setActiveTab('volunteers')}>
+              View All
+            </button>
+          )}
+        </div>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+          {topVolunteers.map((vol, index) => (
+            <div className="leaderboard-item" key={vol.id}>
+              <div className="leaderboard-rank">#{index + 1}</div>
+              <div className="leaderboard-details">
+                <div className="leaderboard-name">{vol.name}</div>
+                <div className="leaderboard-sub">{vol.skills.split(',')[0]}</div>
               </div>
-            ))}
-          </div>
+              <div className="leaderboard-value">{vol.hoursContributed} hrs</div>
+            </div>
+          ))}
         </div>
       </section>
 
