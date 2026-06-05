@@ -7,6 +7,11 @@ PawHope Foundation is a full-stack NGO management platform designed to help orga
 The platform promotes transparency, accountability, and efficient resource allocation by automating donation distribution, tracking expenses, monitoring welfare facilities, and providing actionable insights through real-time analytics.
 
 ---
+## 🌐 Live Demo
+
+🔗 donation-tracker-2jxf.vercel.app
+
+Explore the platform using the demo credentials provided below.
 
 ## 🌟 Features
 
